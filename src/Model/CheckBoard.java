@@ -5,7 +5,6 @@ public class CheckBoard {
     private Player[] players;
     private Player winner = null;
     private Player currentTurn;
-    private Player currentOppo;
 
     public CheckBoard() {
         restart();
@@ -32,21 +31,28 @@ public class CheckBoard {
         }
     }
 
-    public void mark(int[] position) {
+    public int[] mark() {
+        int[] position = currentTurn.mark();
         int row = position[0];
         int col = position[1];
-        if (isValid(row, col)) {
-            board[row][col].setCheckMark(currentTurn.getPlayerMark());
-
-            if (isWinning(row, col, currentTurn)) {
-                winner = currentTurn;
-                flipCurrentPlayer(currentTurn);
-            }
-            else {
-                // change current player
-                flipCurrentPlayer(currentTurn);
-            }
+        while (!isValid(row, col)) {
+            position = currentTurn.mark();
+            row = position[0];
+            col = position[1];
         }
+
+        board[row][col].setCheckMark(currentTurn.getPlayerMark());
+
+        if (isWinning(row, col, currentTurn)) {
+            winner = currentTurn;
+            flipCurrentPlayer(currentTurn);
+        }
+        else {
+            // change current player
+            flipCurrentPlayer(currentTurn);
+        }
+
+        return position;
     }
 
     private boolean isValid(int row, int col) {

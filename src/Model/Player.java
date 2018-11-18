@@ -41,7 +41,7 @@ public class Player {
     public int[] mark() {
         System.out.print(playerName + ", enter your x (0-2) and y (0-2) position: ");
         Scanner scanner = new Scanner(System.in);
-        while (!scanner.hasNext("[0-2\u0020]+")){
+        while (!scanner.hasNext("[0-2\u0020]+")){    //match 0, 1, 2 and space
             System.out.println("Error input! Please input again: ");
             scanner.next();
         }

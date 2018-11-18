@@ -1,4 +1,6 @@
 package Model;
 
-public class BotPlayer {
+public class BotPlayer extends Player {
+    
+
 }

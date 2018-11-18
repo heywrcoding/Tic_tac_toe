@@ -8,8 +8,8 @@ public class TicTacToe {
 
         TicTacToeConsoleView view = new TicTacToeConsoleView(board.getCurrentTurn());
         while (board.getWinner() == null) {
-            position =board.getCurrentTurn().mark();
-            board.mark(position);
+//            position =board.getCurrentTurn().mark();
+            position = board.mark();
             view.markCell(position[0], position[1], board.getCurrentOppo());  // currentTurn player has change in the invocation of board.mark()
         }
 

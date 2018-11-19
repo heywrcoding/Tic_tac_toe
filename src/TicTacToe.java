@@ -3,12 +3,11 @@ import View.TicTacToeConsoleView;
 
 public class TicTacToe {
     public static void main(String[] args) {
-        CheckBoard board = new CheckBoard();
-        int[] position = new int[2];
+        CheckBoard board = new CheckBoard(TicTacToeConsoleView.askGameMode());
+        int[] position;
 
-        TicTacToeConsoleView view = new TicTacToeConsoleView(board.getCurrentTurn());
+        TicTacToeConsoleView view = new TicTacToeConsoleView(board);
         while (board.getWinner() == null) {
-//            position =board.getCurrentTurn().mark();
             position = board.mark();
             view.markCell(position[0], position[1], board.getCurrentOppo());  // currentTurn player has change in the invocation of board.mark()
         }

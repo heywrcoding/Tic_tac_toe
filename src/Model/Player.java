@@ -4,9 +4,9 @@ import java.util.Scanner;
 
 public class Player {
     public static int playerNum = 0;
-    private static Marks senteMark = null; //sente(先手)'s Mark :)
-    private Marks playerMark;
-    private String playerName;
+    static Marks senteMark = null; //sente(先手)'s Mark :)
+    Marks playerMark;
+    String playerName;
 
 
     public Player() {
@@ -38,7 +38,7 @@ public class Player {
 
     }
 
-    public int[] mark() {
+    public int[] mark(CheckBoard board) {
         System.out.print(playerName + ", enter your x (0-2) and y (0-2) position: ");
         Scanner scanner = new Scanner(System.in);
         while (!scanner.hasNext("[0-2\u0020]+")){    //match 0, 1, 2 and space

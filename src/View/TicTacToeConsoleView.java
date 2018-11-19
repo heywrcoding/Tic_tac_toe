@@ -1,5 +1,6 @@
 package View;
 import Model.Cell;
+import Model.CheckBoard;
 import Model.Marks;
 import Model.Player;
 import java.util.*;
@@ -8,14 +9,14 @@ public class TicTacToeConsoleView {
 
     private Cell[][] board = new Cell[3][3];
 
-    public TicTacToeConsoleView(Player currentTurn) {
-        restart(currentTurn);
+    public TicTacToeConsoleView(CheckBoard board) {
+        restart(board);
     }
 
-    private void restart(Player currentTurn) {
+    private void restart(CheckBoard board) {
         clear();
         System.out.println("Welcome to TIC TAC TOE.");
-        System.out.println("You are " + currentTurn.getPlayerMark() + ", and your opponent is " + opponentMark(currentTurn) + ".");
+        System.out.println("You are " + board.getCurrentTurn().getPlayerMark() + ", and your opponent is " + opponentMark(board.getCurrentTurn()) + ".");
         drawBoard();
     }
 
@@ -73,6 +74,16 @@ public class TicTacToeConsoleView {
             return Marks.O;
         else
             return Marks.X;
+    }
+
+    public static int askGameMode() {
+        System.out.println("Please choose game mode: (Enter 1 for Player Against Computer, enter 0 for Player Against Player) ");
+        Scanner scanner = new Scanner(System.in);
+        while (!scanner.hasNext("[01]")) {
+            System.out.println("Error input! Please input again: ");
+            scanner.next();
+        }
+        return scanner.nextInt();
     }
 
 }

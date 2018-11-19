@@ -1,13 +1,21 @@
 package Model;
 
 public class CheckBoard {
+    private int botFlag = 0;  // 1 for starting bot
     private Cell[][] board = new Cell[3][3];
+    private int moveCounter = 0;
     private Player[] players;
     private Player winner = null;
     private Player currentTurn;
+    private boolean isClear = true;
 
-    public CheckBoard() {
+    public CheckBoard(int gameMode) {
+        setBotFlag(gameMode);
         restart();
+    }
+
+    CheckBoard(){
+        clear();
     }
 
     private void restart() {
@@ -16,7 +24,11 @@ public class CheckBoard {
         players = new Player[2];
 
         players[0] = new Player();
-        players[1] = new Player();
+        if (botFlag == 0)
+            players[1] = new Player();
+        else
+            players[1] = new BotPlayer(this);
+
         if (players[0].getPlayerMark() == Marks.X)  // X goes first
             currentTurn = players[0];
         else
@@ -32,16 +44,18 @@ public class CheckBoard {
     }
 
     public int[] mark() {
-        int[] position = currentTurn.mark();
+        int[] position = currentTurn.mark(this);
         int row = position[0];
         int col = position[1];
         while (!isValid(row, col)) {
-            position = currentTurn.mark();
+            position = currentTurn.mark(this);
             row = position[0];
             col = position[1];
         }
 
         board[row][col].setCheckMark(currentTurn.getPlayerMark());
+        moveCounter++;
+        isClear = false;
 
         if (isWinning(row, col, currentTurn)) {
             winner = currentTurn;
@@ -66,23 +80,29 @@ public class CheckBoard {
         return x < 0 || x > 2;
     }
 
-    private boolean isWinning(int thisRow, int thisCol, Player thisPlayer) {
-        return ((board[0][thisCol].getCheckMark() == thisPlayer.getPlayerMark()     //3 checks in one col
-                && board[1][thisCol].getCheckMark() == thisPlayer.getPlayerMark()
-                && board[2][thisCol].getCheckMark() == thisPlayer.getPlayerMark())
-                || (board[thisRow][0].getCheckMark() == thisPlayer.getPlayerMark()  //3 checks in one row
-                && board[thisRow][1].getCheckMark() == thisPlayer.getPlayerMark()
-                && board[thisRow][2].getCheckMark() == thisPlayer.getPlayerMark())
-                || ( thisRow == thisCol
-                && board[0][0].getCheckMark() == thisPlayer.getPlayerMark()  //3 checks in one diagonal
-                && board[1][1].getCheckMark() == thisPlayer.getPlayerMark()
-                && board[2][2].getCheckMark() == thisPlayer.getPlayerMark())
-                || (thisRow == thisCol
-                && board[2][0].getCheckMark() == thisPlayer.getPlayerMark()  //3 checks in another diagonal
-                && board[1][1].getCheckMark() == thisPlayer.getPlayerMark()
-                && board[0][2].getCheckMark() == thisPlayer.getPlayerMark()));
+    boolean isWinning(int thisRow, int thisCol, Player thisPlayer) {
+        if (moveCounter < 5)
+            return ((board[0][thisCol].getCheckMark() == thisPlayer.getPlayerMark()     //3 checks in one col
+                    && board[1][thisCol].getCheckMark() == thisPlayer.getPlayerMark()
+                    && board[2][thisCol].getCheckMark() == thisPlayer.getPlayerMark())
+                    || (board[thisRow][0].getCheckMark() == thisPlayer.getPlayerMark()  //3 checks in one row
+                    && board[thisRow][1].getCheckMark() == thisPlayer.getPlayerMark()
+                    && board[thisRow][2].getCheckMark() == thisPlayer.getPlayerMark())
+                    || ( thisRow == thisCol
+                    && board[0][0].getCheckMark() == thisPlayer.getPlayerMark()  //3 checks in one diagonal
+                    && board[1][1].getCheckMark() == thisPlayer.getPlayerMark()
+                    && board[2][2].getCheckMark() == thisPlayer.getPlayerMark())
+                    || (thisRow == thisCol
+                    && board[2][0].getCheckMark() == thisPlayer.getPlayerMark()  //3 checks in another diagonal
+                    && board[1][1].getCheckMark() == thisPlayer.getPlayerMark()
+                    && board[0][2].getCheckMark() == thisPlayer.getPlayerMark()));
+        else
+            return false;
     }
 
+    public boolean isTieAfterThisMark() {
+        return moveCounter == 8;
+    }
     private void flipCurrentPlayer(Player player) {
         if (players[0].equals(currentTurn))
             currentTurn = players[1];
@@ -103,5 +123,25 @@ public class CheckBoard {
             return players[1];
         else
             return players[0];
+    }
+
+    public void setBotFlag(int botFlag) {
+        this.botFlag = botFlag;
+    }
+
+    public boolean isClear() {
+        return isClear;
+    }
+
+    public int getMoveCounter() {
+        return moveCounter;
+    }
+
+    public Marks getCellMark(int row, int col) {
+        return board[row][col].getCheckMark();
+    }
+
+    public Cell[][] getBoard() {
+        return board;
     }
 }

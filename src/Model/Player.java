@@ -3,13 +3,14 @@ package Model;
 import java.util.Scanner;
 
 public class Player {
-    public static int playerNum = 0;
+    private static int playerNum = 0;
     static Marks senteMark = null; //sente(先手)'s Mark :)
     Marks playerMark;
-    String playerName;
+    private String playerName;
+    Marks oppositeMark;
 
 
-    public Player() {
+    Player() {
         loadPlayerInfo();
     }
 
@@ -23,19 +24,24 @@ public class Player {
                 System.out.println("Error input! Please input again: ");
                 scanner.next();
             }
-            if (scanner.hasNext("[xX]"))
+            if (scanner.hasNext("[xX]")){
                 playerMark = Marks.X;
-            else
+                oppositeMark = Marks.O;
+            }
+            else{
                 playerMark = Marks.O;
-
+                oppositeMark = Marks.X;
+            }
             senteMark = playerMark;
         }
-        else if (senteMark.equals(Marks.X))
+        else if (senteMark.equals(Marks.X)){
             playerMark = Marks.O;
-        else
+            oppositeMark = Marks.X;
+        }
+        else{
             playerMark = Marks.X;
-
-
+            oppositeMark = Marks.O;
+        }
     }
 
     public int[] mark(CheckBoard board) {
@@ -65,5 +71,14 @@ public class Player {
 
     public void setPlayerName(String playerName) {
         this.playerName = playerName;
+    }
+
+    public Marks getOppositeMark() {
+        return oppositeMark;
+    }
+
+    @Override
+    public String toString() {
+        return playerName;
     }
 }

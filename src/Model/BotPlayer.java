@@ -1,5 +1,6 @@
 package Model;
 
+import javax.swing.text.Position;
 import java.util.*;
 
 public class BotPlayer extends Player {
@@ -7,7 +8,7 @@ public class BotPlayer extends Player {
     class Position {
         private int row;
         private int col;
-        int evaluation = -1;
+        int evaluation = 0;
         Position(int row, int col) {
             this.row = row;
             this.col = col;
@@ -15,9 +16,8 @@ public class BotPlayer extends Player {
 
     }
 
-    private static int mainBot = 0;
+    private int mainBot;
     private ArrayList<Position> availablePositions = new ArrayList<>();
-    private CheckBoard boardCopy = new CheckBoard();
 //    private Cell[][] boardCopy = new Cell[3][3];
 
     BotPlayer(CheckBoard board) {
@@ -35,11 +35,13 @@ public class BotPlayer extends Player {
             return senteFirstStep(board);
         }
 
-        getAvailablePositions(board);
-        mainBot = 1;
-        evaluate(this.boardCopy, this);
+//        ArrayList<Position> availablePositions = new ArrayList<>();
 
-        Collections.sort(availablePositions, (Position p1, Position p2) -> p1.evaluation - p2.evaluation);
+        getAvailablePositions(board, availablePositions);
+        mainBot = 1;
+        evaluate(copyCheckBoard(board), this, availablePositions);
+
+        Collections.sort(availablePositions, (Position p1, Position p2) -> p2.evaluation - p1.evaluation);
 
         return new int[] {availablePositions.get(0).row, availablePositions.get(0).col};
     }
@@ -51,39 +53,68 @@ public class BotPlayer extends Player {
         return new int[] {row, col};
     }
 
-    private void getAvailablePositions(CheckBoard board) {
+    private ArrayList<Position> getAvailablePositions(CheckBoard board, ArrayList<Position> availablePositions) {
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 if (board.getCellMark(row, col) == null) {
-                    if (mainBot == 1)
-                        availablePositions.add(new Position(row, col));
-                    boardCopy.getBoard()[row][col].setCheckMark(null);
+//                    if (mainBot == 1)
+                    availablePositions.add(new Position(row, col));
+//                    boardCopy.getBoard()[row][col].setCheckMark(null);
                 }
                 else {
-                    boardCopy.getBoard()[row][col].setCheckMark(board.getCellMark(row, col));
+//                    boardCopy.mark(row, col);
                 }
             }
         }
-
+        return availablePositions;
     }
 
-    private int evaluate(CheckBoard board, BotPlayer player) {
-        getAvailablePositions(board);
+    private CheckBoard copyCheckBoard(CheckBoard checkBoard) {
+        CheckBoard newCopy = new CheckBoard();
+        newCopy.setCurrentTurn(this);
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                if (checkBoard.getCellMark(row, col) == null) {
+                    newCopy.getBoard()[row][col].setCheckMark(null);
+                }
+                else if (checkBoard.getCellMark(row, col) == playerMark) {
+                    newCopy.mark(row, col, this.getPlayerMark());
+                }
+                else {
+                    newCopy.mark(row, col, this.getOppositeMark());
+                }
+
+            }
+        }
+        return newCopy;
+    }
+
+    private int evaluate(CheckBoard board, BotPlayer player, ArrayList<Position> availablePositions) {
+        if (this.mainBot == 0)
+            getAvailablePositions(board, availablePositions);
         Collections.shuffle(availablePositions);
         for (Position p: availablePositions) {
             if (board.isWinning(p.row, p.col, player)) {
                 p.evaluation = 1;  // positive evaluation
+                return p.evaluation;
             }
             else if (board.isTieAfterThisMark()){
                 p.evaluation = 0;
             }
             else {
-                int nextMove = evaluate(board, player.getOppositePlayer());
-                p.evaluation = -nextMove;
+                board.mark(p.row, p.col, this.getPlayerMark());
+                mainBot = 0;
+                board = copyCheckBoard(board);
+                int nextMoveEvaluation = evaluate(board, player.getOppositePlayer(), new ArrayList<Position>());
+                if (nextMoveEvaluation == -1)
+                    p.evaluation = -nextMoveEvaluation;
+                else
+                    p.evaluation = nextMoveEvaluation;
             }
-            if (p.evaluation == 1)
-                return p.evaluation;
+//            if (p.evaluation == 1)
+//                return p.evaluation;
         }
+        Collections.sort(availablePositions, (Position p1, Position p2) -> p2.evaluation - p1.evaluation);
         return availablePositions.get(0).evaluation;
     }
 

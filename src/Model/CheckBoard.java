@@ -53,9 +53,7 @@ public class CheckBoard {
             col = position[1];
         }
 
-        board[row][col].setCheckMark(currentTurn.getPlayerMark());
-        moveCounter++;
-        isClear = false;
+        mark(row,col,currentTurn.getPlayerMark());
 
         if (isWinning(row, col, currentTurn)) {
             winner = currentTurn;
@@ -67,6 +65,12 @@ public class CheckBoard {
         }
 
         return position;
+    }
+
+    void mark(int row, int col, Marks marks) {
+        board[row][col].setCheckMark(marks);
+        moveCounter++;
+        isClear = false;
     }
 
     private boolean isValid(int row, int col) {
@@ -81,7 +85,7 @@ public class CheckBoard {
     }
 
     boolean isWinning(int thisRow, int thisCol, Player thisPlayer) {
-        if (moveCounter < 5)
+        if (moveCounter >= 5)
             return ((board[0][thisCol].getCheckMark() == thisPlayer.getPlayerMark()     //3 checks in one col
                     && board[1][thisCol].getCheckMark() == thisPlayer.getPlayerMark()
                     && board[2][thisCol].getCheckMark() == thisPlayer.getPlayerMark())
@@ -143,5 +147,9 @@ public class CheckBoard {
 
     public Cell[][] getBoard() {
         return board;
+    }
+
+    public void setCurrentTurn(Player currentTurn) {
+        this.currentTurn = currentTurn;
     }
 }

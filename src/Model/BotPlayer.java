@@ -17,7 +17,7 @@ public class BotPlayer extends Player {
     }
 
     private int mainBot;
-    private ArrayList<Position> availablePositions = new ArrayList<>();
+//    private ArrayList<Position> availablePositions = new ArrayList<>();
 //    private Cell[][] boardCopy = new Cell[3][3];
 
     BotPlayer(CheckBoard board) {
@@ -26,6 +26,10 @@ public class BotPlayer extends Player {
     }
     private BotPlayer(Marks m) {
         playerMark = m;
+        if (playerMark == Marks.O)
+            oppositeMark = Marks.X;
+        else
+            oppositeMark = Marks.O;
     }
 
     private int[] botStrategy(CheckBoard board) {
@@ -35,11 +39,12 @@ public class BotPlayer extends Player {
             return senteFirstStep(board);
         }
 
-//        ArrayList<Position> availablePositions = new ArrayList<>();
+        ArrayList<Position> availablePositions = new ArrayList<>();
 
-        getAvailablePositions(board, availablePositions);
+//        getAvailablePositions(board, availablePositions);
+        CheckBoard mockBoard = copyCheckBoard(board, this);
         mainBot = 1;
-        evaluate(copyCheckBoard(board), this, availablePositions);
+        evaluate(mockBoard, this, availablePositions);
 
         Collections.sort(availablePositions, (Position p1, Position p2) -> p2.evaluation - p1.evaluation);
 
@@ -69,7 +74,7 @@ public class BotPlayer extends Player {
         return availablePositions;
     }
 
-    private CheckBoard copyCheckBoard(CheckBoard checkBoard) {
+    private CheckBoard copyCheckBoard(CheckBoard checkBoard, Player player) {
         CheckBoard newCopy = new CheckBoard();
         newCopy.setCurrentTurn(this);
         for (int row = 0; row < 3; row++) {
@@ -77,11 +82,11 @@ public class BotPlayer extends Player {
                 if (checkBoard.getCellMark(row, col) == null) {
                     newCopy.getBoard()[row][col].setCheckMark(null);
                 }
-                else if (checkBoard.getCellMark(row, col) == playerMark) {
-                    newCopy.mark(row, col, this.getPlayerMark());
+                else if (checkBoard.getCellMark(row, col) == player.playerMark) {
+                    newCopy.mark(row, col, player.getPlayerMark());
                 }
                 else {
-                    newCopy.mark(row, col, this.getOppositeMark());
+                    newCopy.mark(row, col, player.getOppositeMark());
                 }
 
             }
@@ -90,8 +95,8 @@ public class BotPlayer extends Player {
     }
 
     private int evaluate(CheckBoard board, BotPlayer player, ArrayList<Position> availablePositions) {
-        if (this.mainBot == 0)
-            getAvailablePositions(board, availablePositions);
+//        if (this.mainBot == 0)
+        getAvailablePositions(board, availablePositions);
         Collections.shuffle(availablePositions);
         for (Position p: availablePositions) {
             if (board.isWinning(p.row, p.col, player)) {
@@ -102,14 +107,15 @@ public class BotPlayer extends Player {
                 p.evaluation = 0;
             }
             else {
-                board.mark(p.row, p.col, this.getPlayerMark());
+                CheckBoard mockBoard = copyCheckBoard(board, player);
+                mockBoard.mark(p.row, p.col, player.getPlayerMark());
                 mainBot = 0;
-                board = copyCheckBoard(board);
-                int nextMoveEvaluation = evaluate(board, player.getOppositePlayer(), new ArrayList<Position>());
-                if (nextMoveEvaluation == -1)
-                    p.evaluation = -nextMoveEvaluation;
-                else
-                    p.evaluation = nextMoveEvaluation;
+                int nextMoveEvaluation = evaluate(mockBoard, player.getOppositePlayer(), new ArrayList<Position>());
+//                if (nextMoveEvaluation == -1)
+//                    p.evaluation = -nextMoveEvaluation;
+//                else
+//                    p.evaluation = nextMoveEvaluation;
+                p.evaluation = -nextMoveEvaluation;
             }
 //            if (p.evaluation == 1)
 //                return p.evaluation;

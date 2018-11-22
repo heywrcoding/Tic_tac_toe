@@ -1,6 +1,4 @@
 package Model;
-
-import javax.swing.text.Position;
 import java.util.*;
 
 public class BotPlayer extends Player {
@@ -17,8 +15,6 @@ public class BotPlayer extends Player {
     }
 
     private int mainBot;
-//    private ArrayList<Position> availablePositions = new ArrayList<>();
-//    private Cell[][] boardCopy = new Cell[3][3];
 
     BotPlayer(CheckBoard board) {
         super();
@@ -39,16 +35,19 @@ public class BotPlayer extends Player {
             return senteFirstStep(board);
         }
 
-        ArrayList<Position> availablePositions = new ArrayList<>();
+        if (board.getMoveCounter() != 9){
+            ArrayList<Position> availablePositions = new ArrayList<>();
+            CheckBoard mockBoard = copyCheckBoard(board, this);
+            mainBot = 1;
+            evaluate(mockBoard, this, availablePositions);
 
-//        getAvailablePositions(board, availablePositions);
-        CheckBoard mockBoard = copyCheckBoard(board, this);
-        mainBot = 1;
-        evaluate(mockBoard, this, availablePositions);
+            Collections.sort(availablePositions, (Position p1, Position p2) -> p2.evaluation - p1.evaluation);
 
-        Collections.sort(availablePositions, (Position p1, Position p2) -> p2.evaluation - p1.evaluation);
+            return new int[] {availablePositions.get(0).row, availablePositions.get(0).col};
 
-        return new int[] {availablePositions.get(0).row, availablePositions.get(0).col};
+        }
+        else
+            return new int[] {-1, -1};
     }
 
     private int[] senteFirstStep(CheckBoard board) {
@@ -58,20 +57,14 @@ public class BotPlayer extends Player {
         return new int[] {row, col};
     }
 
-    private ArrayList<Position> getAvailablePositions(CheckBoard board, ArrayList<Position> availablePositions) {
+    private void getAvailablePositions(CheckBoard board, ArrayList<Position> availablePositions) {
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 if (board.getCellMark(row, col) == null) {
-//                    if (mainBot == 1)
                     availablePositions.add(new Position(row, col));
-//                    boardCopy.getBoard()[row][col].setCheckMark(null);
-                }
-                else {
-//                    boardCopy.mark(row, col);
                 }
             }
         }
-        return availablePositions;
     }
 
     private CheckBoard copyCheckBoard(CheckBoard checkBoard, Player player) {
@@ -94,34 +87,32 @@ public class BotPlayer extends Player {
         return newCopy;
     }
 
-    private int evaluate(CheckBoard board, BotPlayer player, ArrayList<Position> availablePositions) {
+    private Position evaluate(CheckBoard board, BotPlayer player, ArrayList<Position> availablePositions) {
 //        if (this.mainBot == 0)
         getAvailablePositions(board, availablePositions);
         Collections.shuffle(availablePositions);
         for (Position p: availablePositions) {
-            if (board.isWinning(p.row, p.col, player)) {
+            CheckBoard mockBoard = copyCheckBoard(board, player);
+            mockBoard.mark(p.row, p.col, player.getPlayerMark());
+            if (mockBoard.isWinning(p.row, p.col, player)) {
                 p.evaluation = 1;  // positive evaluation
-                return p.evaluation;
+                return p;
             }
-            else if (board.isTieAfterThisMark()){
+            else if (mockBoard.isTieAfterThisMark()){
                 p.evaluation = 0;
             }
             else {
-                CheckBoard mockBoard = copyCheckBoard(board, player);
-                mockBoard.mark(p.row, p.col, player.getPlayerMark());
                 mainBot = 0;
-                int nextMoveEvaluation = evaluate(mockBoard, player.getOppositePlayer(), new ArrayList<Position>());
+                Position nextMove = evaluate(mockBoard, player.getOppositePlayer(), new ArrayList<Position>());
 //                if (nextMoveEvaluation == -1)
-//                    p.evaluation = -nextMoveEvaluation;
+//                    p.evaluation = -nextMove.evaluation;
 //                else
-//                    p.evaluation = nextMoveEvaluation;
-                p.evaluation = -nextMoveEvaluation;
+//                    p.evaluation = nextMove.evaluation;
+                p.evaluation = -nextMove.evaluation;
             }
-//            if (p.evaluation == 1)
-//                return p.evaluation;
         }
         Collections.sort(availablePositions, (Position p1, Position p2) -> p2.evaluation - p1.evaluation);
-        return availablePositions.get(0).evaluation;
+        return availablePositions.get(0);
     }
 
     @Override

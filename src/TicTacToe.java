@@ -9,10 +9,16 @@ public class TicTacToe {
         TicTacToeConsoleView view = new TicTacToeConsoleView(board);
         while (board.getWinner() == null) {
             position = board.mark();
-            view.markCell(position[0], position[1], board.getCurrentOppo());  // currentTurn player has change in the invocation of board.mark()
+            if (position[0] != -1 && position[1] != -1)
+                view.markCell(position[0], position[1], board.getCurrentOppo());  // currentTurn player has change in the invocation of board.mark()
+            else
+                break;
         }
 
-        System.out.println("Winner is: " + board.getWinner());
+        if (board.getWinner() != null)
+            System.out.println("Winner is: " + board.getWinner());
+        else
+            System.out.println("No winner! It is a tie.");
 
     }
 }

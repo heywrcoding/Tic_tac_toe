@@ -47,6 +47,9 @@ public class CheckBoard {
         int[] position = currentTurn.mark(this);
         int row = position[0];
         int col = position[1];
+        if (row == -1 && col == -1){
+            return position;
+        }
         while (!isValid(row, col)) {
             position = currentTurn.mark(this);
             row = position[0];
@@ -104,7 +107,7 @@ public class CheckBoard {
             return false;
     }
 
-    public boolean isTieAfterThisMark() {
+    boolean isTieAfterThisMark() {
         return moveCounter == 8;
     }
     private void flipCurrentPlayer(Player player) {
@@ -129,27 +132,27 @@ public class CheckBoard {
             return players[0];
     }
 
-    public void setBotFlag(int botFlag) {
+    private void setBotFlag(int botFlag) {
         this.botFlag = botFlag;
     }
 
-    public boolean isClear() {
+    boolean isClear() {
         return isClear;
     }
 
-    public int getMoveCounter() {
+    int getMoveCounter() {
         return moveCounter;
     }
 
-    public Marks getCellMark(int row, int col) {
+    Marks getCellMark(int row, int col) {
         return board[row][col].getCheckMark();
     }
 
-    public Cell[][] getBoard() {
+    Cell[][] getBoard() {
         return board;
     }
 
-    public void setCurrentTurn(Player currentTurn) {
+    void setCurrentTurn(Player currentTurn) {
         this.currentTurn = currentTurn;
     }
 }

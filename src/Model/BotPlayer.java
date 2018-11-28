@@ -3,7 +3,7 @@ import java.util.*;
 
 public class BotPlayer extends Player {
 
-    class Position {
+    private class Position {
         private int row;
         private int col;
         int evaluation = 0;
@@ -13,8 +13,6 @@ public class BotPlayer extends Player {
         }
 
     }
-
-    private int mainBot;
 
     BotPlayer(CheckBoard board) {
         super();
@@ -29,16 +27,14 @@ public class BotPlayer extends Player {
     }
 
     private int[] botStrategy(CheckBoard board) {
-        int[] position;
 
         if (board.isClear()) {
-            return senteFirstStep(board);
+            return senteFirstStep();
         }
 
         if (board.getMoveCounter() != 9){
             ArrayList<Position> availablePositions = new ArrayList<>();
             CheckBoard mockBoard = copyCheckBoard(board, this);
-            mainBot = 1;
             evaluate(mockBoard, this, availablePositions);
 
             Collections.sort(availablePositions, (Position p1, Position p2) -> p2.evaluation - p1.evaluation);
@@ -50,7 +46,7 @@ public class BotPlayer extends Player {
             return new int[] {-1, -1};
     }
 
-    private int[] senteFirstStep(CheckBoard board) {
+    private int[] senteFirstStep() {
 
         int row = (int) (Math.random() * 2);
         int col = (int) (Math.random() * 2);
@@ -88,7 +84,6 @@ public class BotPlayer extends Player {
     }
 
     private Position evaluate(CheckBoard board, BotPlayer player, ArrayList<Position> availablePositions) {
-//        if (this.mainBot == 0)
         getAvailablePositions(board, availablePositions);
         Collections.shuffle(availablePositions);
         for (Position p: availablePositions) {
@@ -102,12 +97,7 @@ public class BotPlayer extends Player {
                 p.evaluation = 0;
             }
             else {
-                mainBot = 0;
                 Position nextMove = evaluate(mockBoard, player.getOppositePlayer(), new ArrayList<Position>());
-//                if (nextMoveEvaluation == -1)
-//                    p.evaluation = -nextMove.evaluation;
-//                else
-//                    p.evaluation = nextMove.evaluation;
                 p.evaluation = -nextMove.evaluation;
             }
         }

@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class Player {
     private static int playerNum = 0;
-    static Marks senteMark = null; //sente(先手)'s Mark :)
+    private static Marks senteMark = null; //sente(先手)'s Mark :)
     Marks playerMark;
     private String playerName;
     Marks oppositeMark;
@@ -73,7 +73,7 @@ public class Player {
         this.playerName = playerName;
     }
 
-    public Marks getOppositeMark() {
+    Marks getOppositeMark() {
         return oppositeMark;
     }
 
